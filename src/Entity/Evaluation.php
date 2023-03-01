@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\EvaluationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,29 +25,12 @@ class Evaluation
     #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id')]
     private ?User $user = null;
 
-    #[ORM\OneToMany(mappedBy: 'evaluation', targetEntity: EvaluationSkill::class, fetch: 'EAGER')]
-    private collection $evaluationSkills;
+    #[ORM\OneToMany(mappedBy: 'evaluation', targetEntity: EvaluationSkill::class, cascade: ['persist', 'remove'], fetch: 'EAGER')]
+    private Collection $evaluationSkills;
 
-    /**
-     * @return Collection
-     */
-    public function getEvaluationSkills(): Collection
+    public function __construct()
     {
-        return $this->evaluationSkills;
-    }
-
-    /**
-     * @param Collection $evaluationSkills
-     */
-    public function setEvaluationSkills(Collection $evaluationSkills): void
-    {
-        $this->evaluationSkills = $evaluationSkills;
-    }
-
-
-    public function addEvaluationSkill(EvaluationSkill $evaluationSkill): void
-    {
-        $this->evaluationSkills->add($evaluationSkill);
+        $this->evaluationSkills = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -78,8 +62,46 @@ class Evaluation
         return $this;
     }
 
+    /**
+     * @return Collection
+     */
+    public function getEvaluationSkills(): Collection
+    {
+        return $this->evaluationSkills;
+    }
+
+    /**
+     * @param Collection $evaluationSkills
+     */
+    public function setEvaluationSkills(Collection $evaluationSkills): void
+    {
+        $this->evaluationSkills = $evaluationSkills;
+    }
+
+
+    public function addEvaluationSkill(EvaluationSkill $evaluationSkill): void
+    {
+        $this->evaluationSkills->add($evaluationSkill);
+    }
+
     public function __toString(): string
     {
         return $this->id;
+    }
+
+    public function __clone(): void
+    {
+        //Surcharge le clonage de l'evaluation en passant les propriétés id et dateEval à null
+        $this->id = null;
+        $this->dateEval = null;
+
+        $evaluationSkills = new ArrayCollection();
+
+        foreach ($this->evaluationSkills as $evaluationSkill) {
+            //Ajoute les clones des EvaluationSkills
+            $evaluationSkills->add(clone $evaluationSkill);
+        }
+
+        $this->evaluationSkills = $evaluationSkills;
     }
 }

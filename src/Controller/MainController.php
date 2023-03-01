@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Form\EvalSkillFormType;
 use App\Repository\EvaluationRepository;
 use App\Repository\UserRepository;
-use App\Service\EvaluationService;
+use App\Services\EvaluationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,21 +21,18 @@ class MainController extends AbstractController
 
         //Récupération de la dernière évaluation mise à jour
         //Avec les skills non évaluée précédemment
-        $lastEval = $evaluationService->getLastUserEvaluation($user);
-
-//        dd($lastEval);
+        $newEvaluation = $evaluationService->newEvaluation($user);
 
         //Création du formulaire auquel on passe la dernière évaluation
         //précédemment récupérée
-        $form = $this->createForm(EvalSkillFormType::class, $lastEval);
+        $form = $this->createForm(EvalSkillFormType::class, $newEvaluation);
         $form->handleRequest($request);
-//        dd($form);
 
-        if ($form->isSubmitted()){
-//            $evaluationRepo->save($form->getData());
+        if ($form->isSubmitted()) {
+            $evaluationRepo->save($form->getData(), true);
         }
 
-        return $this->renderForm('main/index.html.twig', [
+        return $this->render('main/index.html.twig', [
             'form' => $form,
         ]);
     }

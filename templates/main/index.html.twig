@@ -4,8 +4,11 @@
 
 {% block body %}
     {{ form_start(form) }}
-{#    {{ form_row(form.skill) }}#}
-    {{ form_row(form) }}
+    {% for child in form.evaluationSkills.children %}
+        <br>
+        {{ form_row(child, {'label': child.vars.value.skill}) }}
+    {% endfor %}
     <button class="btn btn-primary">{{ button_label|default('Valider') }}</button>
+    {{ form_rest(form) }}
     {{ form_end(form) }}
 {% endblock %}

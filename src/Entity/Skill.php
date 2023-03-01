@@ -52,6 +52,6 @@ class Skill
 
     public function __toString(): string
     {
-        return $this->id;
+        return $this->name;
     }
 }

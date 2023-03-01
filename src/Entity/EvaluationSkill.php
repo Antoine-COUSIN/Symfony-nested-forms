@@ -198,6 +198,14 @@ class EvaluationSkill
         return $this;
     }
 
+    public function __clone(): void
+    {
+        //Surcharge le clonage des EvaluationSkills en passant la propriété id à null
+        $this->id = null;
+    }
+
+    //Contrainte de validation du formulaire ci-dessous
+
 //    private function allEvaluationNull()
 //    {
 //        return $this->getSkillLvl() === null

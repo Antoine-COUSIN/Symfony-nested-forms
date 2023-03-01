@@ -40,16 +40,21 @@ class SkillRepository extends ServiceEntityRepository
         }
     }
 
-        /**
-         * @return Skill[] Returns an array of Skill objects
-         */
-        public function findOthers(array $ids): array
-        {
-            $qb = $this->createQueryBuilder('s');
-            return $qb->where('s.id not in (:val)')
-                ->setParameter('val', $ids, Types::SIMPLE_ARRAY)
-                ->getQuery()
-                ->getResult()
-            ;
+    /**
+     * @return Skill[] Returns an array of Skill objects
+     */
+    public function findOthers(array $ids): array
+    {
+        $qb = $this->createQueryBuilder('s');
+
+        //TODO not in ne fonctionne pas avec les binary dépanné mais à revoir
+        $index = 1;
+        foreach ($ids as $id) {
+            $qb->andWhere('s.id != :val' . $index)
+                ->setParameter('val' . $index, $id, Types::BINARY);
+            $index++;
         }
+
+        return $qb->getQuery()->getResult();
+    }
 }
